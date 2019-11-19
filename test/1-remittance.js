@@ -270,7 +270,7 @@ contract("Remittance features", accounts => {
       const gasUsed = new BN(txObj.receipt.gasUsed);
       const txCost = gasPrice.mul(gasUsed);
 
-      endReceiverBalance = new BN(await web3.eth.getBalance(receiver));
+      const endReceiverBalance = new BN(await web3.eth.getBalance(receiver));
 
       assert.strictEqual(
         startReceiverBalance
@@ -282,7 +282,7 @@ contract("Remittance features", accounts => {
         "Eth Balance for reciever not valid after withdrawal"
       );
 
-      let endExchangeBalance = new BN(await web3.eth.getBalance(exchange));
+      const endExchangeBalance = new BN(await web3.eth.getBalance(exchange));
 
       assert.strictEqual(
         await web3.eth.getBalance(exchange),
@@ -317,9 +317,9 @@ contract("Remittance features", accounts => {
     });
 
     it("Allows owner to withdraw commision", async () => {
-      let startCommisionBalance = instance.commisions(owner);
+      const startCommisionBalance = instance.commisions(owner);
 
-      let startOwnerBalance = new BN(await web3.eth.getBalance(owner));
+      const startOwnerBalance = new BN(await web3.eth.getBalance(owner));
 
       const txObj = await instance.withdrawCommision({
         from: owner
