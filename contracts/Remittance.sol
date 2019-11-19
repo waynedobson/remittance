@@ -70,6 +70,7 @@ contract Remittance is Owned {
       emit LogDepositCancelled(msg.sender, thisDeposit.amount, storeLocation);
 
       (success,) = msg.sender.call.value(thisDeposit.amount)("");
+      require(success, "Cancel deposit failed.");
     }
 
     function withdraw(bytes32 storeLocation) public returns(bool success) {
