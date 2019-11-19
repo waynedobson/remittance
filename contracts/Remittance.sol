@@ -84,6 +84,7 @@ contract Remittance is Owned {
       emit LogWithdrawn(msg.sender, storeLocation, amount);
 
       (success,) = msg.sender.call.value(amount)("");
+      require(success, "Withdrawal failed.");
     }
 
     function withdrawCommision() public _onlyOwner returns(bool success) {
@@ -96,5 +97,6 @@ contract Remittance is Owned {
       emit LogCommisionWithdrawn(msg.sender, amount);
 
       (success,) = msg.sender.call.value(amount)("");
+      require(success, "Commision withdrawal failed.");
     }
 }
