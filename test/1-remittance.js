@@ -106,7 +106,11 @@ contract("Remittance features", accounts => {
       );
 
       const commisionPaid = await instance.commisions.call(owner);
-      assert(commisionPaid.eq(commision), "Incorrect commision amount)");
+      assert.strictEqual(
+        commisionPaid.toString(),
+        commision.toString(),
+        "Incorrect commision amount)"
+      );
     });
 
     it("Fails if nil deposit", async () => {
