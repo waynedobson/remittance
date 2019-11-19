@@ -273,7 +273,7 @@ contract("Remittance features", accounts => {
       endReceiverBalance = new BN(await web3.eth.getBalance(receiver));
 
       assert.strictEqual(
-        await startReceiverBalance
+        startReceiverBalance
           .sub(txCost)
           .sub(commision)
           .add(new BN(toWei("0.1", "ether")))
