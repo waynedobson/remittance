@@ -110,7 +110,7 @@ contract("Remittance features", accounts => {
           from: sender,
           value: toWei("0", "ether")
         }),
-        "No Ether sent"
+        "Not Enough Ether sent"
       );
     });
 

@@ -38,7 +38,7 @@ contract Remittance is Owned {
 
     function deposit(bytes32 storeLocation, uint delay) public payable returns(bool) {
       require(storeLocation != 0, "storeLocation required");
-      require(msg.value > 0, "No Ether sent");
+      require(msg.value > TX_COMM, "Not Enough Ether sent");
       require(delay > 0, "Delay required");
       require(deposits[storeLocation].sender == address(0), "storeLocation in use");
 
