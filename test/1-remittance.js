@@ -49,40 +49,45 @@ contract("Remittance features", accounts => {
       });
 
       assert.strictEqual(txObj.logs.length, 2, "There should be 2 events");
+
+      const logCommisionMade = txObj.logs[0];
+
       assert.strictEqual(
-        txObj.logs[0].event,
+        logCommisionMade.event,
         "LogCommisionMade",
         "First event is not LogCommisionMade"
       );
       assert.strictEqual(
-        txObj.logs[0].args[0],
+        logCommisionMade.args[0],
         sender,
         "Event emmitter address is sender"
       );
       assert.strictEqual(
-        txObj.logs[0].args[1],
+        logCommisionMade.args[1],
         await instance.owner(),
         "Incorrect owner address"
       );
       assert.strictEqual(
-        txObj.logs[0].args[2].toString(),
+        logCommisionMade.args[2].toString(),
         "1000",
         "Incorrect commision amount"
       );
 
+      const logDepositMade = txObj.logs[1];
+
       assert.strictEqual(
-        txObj.logs[1].event,
+        logDepositMade.event,
         "LogNewDepositMade",
         "Second event is not LogNewDepositMade"
       );
       assert.strictEqual(
-        txObj.logs[1].args[0],
+        logDepositMade.args[0],
         sender,
         "Incorrect Sender address"
       );
 
       assert.strictEqual(
-        txObj.logs[1].args[2].toString(),
+        logDepositMade.args[2].toString(),
         new BN(toWei("0.1", "ether")).sub(commision).toString(),
         "Incorrect Eth amount in event(taking into acccount commision)"
       );
@@ -166,14 +171,17 @@ contract("Remittance features", accounts => {
       let txObj = await instance.cancelDeposit(storeLocation, {
         from: sender
       });
+
+      const logDepositCancelled = txObj.logs[0];
+
       assert.strictEqual(txObj.logs.length, 1); // correct number of logs
-      assert.strictEqual(txObj.logs[0].event, "LogDepositCancelled"); // log is LogDepositCancelled
-      assert.strictEqual(txObj.logs[0].args[0], sender); // owner address matches
+      assert.strictEqual(logDepositCancelled.event, "LogDepositCancelled"); // log is LogDepositCancelled
+      assert.strictEqual(logDepositCancelled.args[0], sender); // owner address matches
       assert.strictEqual(
-        txObj.logs[0].args[1].toString(),
+        logDepositCancelled.args[1].toString(),
         new BN(toWei("0.1", "ether")).sub(commision).toString()
       ); // amount is correct less commision
-      assert.strictEqual(txObj.logs[0].args[2], storeLocation); // Password is correct
+      assert.strictEqual(logDepositCancelled.args[2], storeLocation); // Password is correct
 
       const deposit = instance.deposits.call(storeLocation);
       assert.strictEqual(deposit.sender, undefined);
@@ -240,12 +248,14 @@ contract("Remittance features", accounts => {
         from: receiver
       });
 
+      const logWithdrawn = txObj.logs[0];
+
       assert.strictEqual(txObj.logs.length, 1);
-      assert.strictEqual(txObj.logs[0].event, "LogWithdrawn");
-      assert.strictEqual(txObj.logs[0].args[0], receiver);
-      assert.strictEqual(txObj.logs[0].args[1], storeLocation);
+      assert.strictEqual(logWithdrawn.event, "LogWithdrawn");
+      assert.strictEqual(logWithdrawn.args[0], receiver);
+      assert.strictEqual(logWithdrawn.args[1], storeLocation);
       assert.strictEqual(
-        txObj.logs[0].args[2].toString(),
+        logWithdrawn.args[2].toString(),
         new BN(toWei("0.1", "ether")).sub(commision).toString()
       );
 
@@ -311,10 +321,12 @@ contract("Remittance features", accounts => {
         from: owner
       });
 
+      const logCommisionWithdrawn = txObj.logs[0];
+
       assert.strictEqual(txObj.logs.length, 1);
-      assert.strictEqual(txObj.logs[0].event, "LogCommisionWithdrawn");
-      assert.strictEqual(txObj.logs[0].args[0], owner);
-      assert(txObj.logs[0].args[1].eq(commision));
+      assert.strictEqual(logCommisionWithdrawn.event, "LogCommisionWithdrawn");
+      assert.strictEqual(logCommisionWithdrawn.args[0], owner);
+      assert(logCommisionWithdrawn.args[1].eq(commision));
 
       const tx = await web3.eth.getTransaction(txObj.tx);
 
