@@ -2,7 +2,7 @@ pragma solidity 0.5.11;
 
 contract Owned {
 
-    address public owner;
+    address private owner;
 
     event LogOwnerChanged(address indexed emitter, address indexed newOwner);
 
@@ -24,5 +24,9 @@ contract Owned {
         emit LogOwnerChanged(msg.sender, newOwner);
 
         return true;
+    }
+
+    function getOwner() public view returns (address) {
+        return owner;
     }
 }

@@ -64,7 +64,7 @@ contract("Remittance features", accounts => {
       );
       assert.strictEqual(
         logCommisionMade.args[1],
-        await instance.owner(),
+        await instance.getOwner(),
         "Incorrect owner address"
       );
       assert.strictEqual(

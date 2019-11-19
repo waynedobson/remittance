@@ -44,6 +44,7 @@ contract Remittance is Owned {
 
       uint amount = msg.value.sub(TX_COMM);
       uint deadline = now.add(delay);
+      address owner = getOwner();
 
       commisions[owner] = commisions[owner].add(TX_COMM);
       emit LogCommisionMade(msg.sender, owner, TX_COMM);
