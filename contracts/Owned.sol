@@ -4,7 +4,7 @@ contract Owned {
 
     address public owner;
 
-    event LogOwnerChanged(address indexed newOwner);
+    event LogOwnerChanged(address indexed emitter, address indexed newOwner);
 
     modifier _onlyOwner {
         require(msg.sender == owner, 'Access restricted to owner');
@@ -21,7 +21,7 @@ contract Owned {
 
         owner = newOwner;
 
-        emit LogOwnerChanged(newOwner);
+        emit LogOwnerChanged(msg.sender, newOwner);
 
         return true;
     }
