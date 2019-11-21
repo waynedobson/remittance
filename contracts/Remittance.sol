@@ -30,10 +30,9 @@ contract Remittance is Owned {
       revert("No fallback function");
     }
 
-    function getStoreLocation(bytes32 senderPassword, bytes32 receiverPassword) public view returns(bytes32 hash) {
-      require(senderPassword != 0, "Sender password required");
-      require(receiverPassword != 0, "Receiver password required");
-      hash = keccak256(abi.encodePacked(address(this), senderPassword, receiverPassword));
+    function getStoreLocation(bytes32 password, address exchange) public view returns(bytes32 hash) {
+      require(password != 0, "Password required");
+      hash = keccak256(abi.encodePacked(address(this), password, exchange));
     }
 
     function deposit(bytes32 storeLocation, uint delay) public payable returns(bool) {
@@ -59,7 +58,9 @@ contract Remittance is Owned {
       return true;
     }
 
-    function cancelDeposit(bytes32 storeLocation) public returns(bool success) {
+    function cancelDeposit(bytes32 password, address exchange) public returns(bool success) {
+      bytes32 storeLocation = getStoreLocation(password, exchange);
+
       Deposit memory thisDeposit = deposits[storeLocation];
 
       require(thisDeposit.amount > 0, "No deposit at this storeLocation");
@@ -74,7 +75,9 @@ contract Remittance is Owned {
       require(success, "Cancel deposit failed.");
     }
 
-    function withdraw(bytes32 storeLocation) public returns(bool success) {
+    function withdraw(bytes32 password) public returns(bool success) {
+      bytes32 storeLocation = getStoreLocation(password, msg.sender);
+
       uint amount = deposits[storeLocation].amount;
 
       require(amount > 0, "No deposit at this storeLocation");
