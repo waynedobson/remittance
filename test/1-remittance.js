@@ -339,13 +339,13 @@ contract("Remittance features", accounts => {
       const gasPrice = new BN(tx.gasPrice);
 
       const gasUsed = new BN(txObj.receipt.gasUsed);
-      const allowedGas = gasPrice.mul(gasUsed);
+      const txCost = gasPrice.mul(gasUsed);
 
       endOwnerBalance = new BN(await web3.eth.getBalance(owner));
 
       assert.strictEqual(
         await startOwnerBalance
-          .sub(allowedGas)
+          .sub(txCost)
           .add(commision)
           .toString(),
         endOwnerBalance.toString(),
