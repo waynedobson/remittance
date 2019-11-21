@@ -17,8 +17,8 @@ contract Remittance is Owned {
     mapping(bytes32 => Deposit) public deposits;
     mapping(address => uint) public commisions;
 
-    event LogNewDepositMade(address indexed emitter, uint deadline, uint amount, bytes32 storeLocation);
-    event LogCommisionMade(address indexed emitter, address owner, uint amount);
+    event LogNewDepositMade(address indexed emitter, uint deadline, uint amount, bytes32 indexed storeLocation);
+    event LogCommisionMade(address indexed emitter, address indexed owner, uint amount);
     event LogDepositCancelled(address indexed emitter, uint amount, bytes32 hashedOTP);
     event LogWithdrawn(address indexed emitter, bytes32 hashedOTP, uint amount);
     event LogCommisionWithdrawn(address indexed emitter, uint amount);
@@ -67,9 +67,9 @@ contract Remittance is Owned {
       require(now >= thisDeposit.deadline, "Cannot cancel a deposit before it has expired");
       require(thisDeposit.sender == msg.sender, "Only the depositor can cancel an order");
 
-      delete(deposits[storeLocation]);
-
       emit LogDepositCancelled(msg.sender, thisDeposit.amount, storeLocation);
+
+      delete(deposits[storeLocation]);
 
       (success,) = msg.sender.call.value(thisDeposit.amount)("");
       require(success, "Cancel deposit failed.");
@@ -82,10 +82,9 @@ contract Remittance is Owned {
 
       require(amount > 0, "No deposit at this storeLocation");
 
-      deposits[storeLocation].deadline = 0;
-      deposits[storeLocation].amount = 0;
-
       emit LogWithdrawn(msg.sender, storeLocation, amount);
+
+      delete(deposits[storeLocation]);
 
       (success,) = msg.sender.call.value(amount)("");
       require(success, "Withdrawal failed.");

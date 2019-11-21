@@ -105,6 +105,30 @@ contract("Remittance features", accounts => {
       );
     });
 
+    it("Allows re-use of password after withdrawal", async () => {
+      await instance.deposit(storeLocation, duration.days(3), {
+        from: sender,
+        value: toWei("0.1", "ether")
+      });
+
+      await increaseTime(duration.days(3));
+
+      await instance.withdraw(password, {
+        from: owner
+      });
+
+      await instance.deposit(storeLocation, duration.days(3), {
+        from: sender,
+        value: toWei("0.1", "ether")
+      });
+
+      deposit = await instance.deposits.call(storeLocation);
+      assert.strictEqual(
+        deposit.amount.toString(),
+        new BN(toWei("0.1", "ether")).sub(commision).toString()
+      );
+    });
+
     it("Fails if nil deposit", async () => {
       await truffleAssert.reverts(
         instance.deposit(storeLocation, duration.days(3), {
