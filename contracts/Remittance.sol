@@ -32,6 +32,7 @@ contract Remittance is Owned {
 
     function getStoreLocation(bytes32 password, address exchange) public view returns(bytes32 hash) {
       require(password != 0, "Password required");
+      require(exchange != address(0x0), "exchange address required");
       hash = keccak256(abi.encodePacked(address(this), password, exchange));
     }
 
@@ -63,6 +64,7 @@ contract Remittance is Owned {
 
       Deposit memory thisDeposit = deposits[storeLocation];
 
+      require(password != 0, "Password required");
       require(thisDeposit.amount > 0, "No deposit at this storeLocation");
       require(now >= thisDeposit.deadline, "Cannot cancel a deposit before it has expired");
       require(thisDeposit.sender == msg.sender, "Only the depositor can cancel an order");
@@ -81,6 +83,7 @@ contract Remittance is Owned {
       uint amount = deposits[storeLocation].amount;
 
       require(amount > 0, "No deposit at this storeLocation");
+      require(password != 0, "Password required");
 
       emit LogWithdrawn(msg.sender, storeLocation, amount);
 
