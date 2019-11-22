@@ -56,6 +56,11 @@ contract("Remittance features", accounts => {
         "1000",
         "Incorrect commision amount"
       );
+      assert.strictEqual(
+        logCommisionMade.args[3].toString(),
+        storeLocation.toString(),
+        "Incorrect storeLocation"
+      );
 
       const logDepositMade = txObj.logs[1];
 

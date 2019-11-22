@@ -18,9 +18,9 @@ contract Remittance is Owned {
     mapping(address => uint) public commisions;
 
     event LogNewDepositMade(address indexed emitter, uint deadline, uint amount, bytes32 indexed storeLocation);
-    event LogCommisionMade(address indexed emitter, address indexed owner, uint amount);
-    event LogDepositCancelled(address indexed emitter, uint amount, bytes32 hashedOTP);
-    event LogWithdrawn(address indexed emitter, bytes32 hashedOTP, uint amount);
+    event LogCommisionMade(address indexed emitter, address indexed owner, uint amount, bytes32 indexed storeLocation);
+    event LogDepositCancelled(address indexed emitter, uint amount, bytes32 indexed storeLocation);
+    event LogWithdrawn(address indexed emitter, bytes32 indexed storeLocation, uint amount);
     event LogCommisionWithdrawn(address indexed emitter, uint amount);
 
     constructor () public {
@@ -45,7 +45,7 @@ contract Remittance is Owned {
       address owner = getOwner();
 
       commisions[owner] = commisions[owner].add(TX_COMM);
-      emit LogCommisionMade(msg.sender, owner, TX_COMM);
+      emit LogCommisionMade(msg.sender, owner, TX_COMM, storeLocation);
 
       emit LogNewDepositMade(msg.sender, deadline, amount, storeLocation);
       deposits[storeLocation] = Deposit({
