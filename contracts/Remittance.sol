@@ -30,10 +30,10 @@ contract Remittance is Owned {
       revert("No fallback function");
     }
 
-    function getStoreLocation(bytes32 password, address exchange) public view returns(bytes32 hash) {
-      require(password != 0, "Password required");
-      require(exchange != address(0x0), "exchange address required");
-      hash = keccak256(abi.encodePacked(address(this), password, exchange));
+    function getStoreLocation(bytes32 senderpassword, bytes32 receiverpassword) public view returns(bytes32 hash) {
+        require(senderpassword != 0, "Password required");
+        require(receiverpassword != 0, "Password required");
+      hash = keccak256(abi.encodePacked(address(this), senderpassword, receiverpassword));
     }
 
     function deposit(bytes32 storeLocation, uint delay) public payable returns(bool) {
@@ -59,12 +59,10 @@ contract Remittance is Owned {
       return true;
     }
 
-    function cancelDeposit(bytes32 password, address exchange) public returns(bool success) {
-      bytes32 storeLocation = getStoreLocation(password, exchange);
+    function cancelDeposit(bytes32 storeLocation) public returns(bool success) {
 
       Deposit memory thisDeposit = deposits[storeLocation];
 
-      require(password != 0, "Password required");
       require(thisDeposit.amount > 0, "No deposit at this storeLocation");
       require(now >= thisDeposit.deadline, "Cannot cancel a deposit before it has expired");
       require(thisDeposit.sender == msg.sender, "Only the depositor can cancel an order");
@@ -77,13 +75,14 @@ contract Remittance is Owned {
       require(success, "Cancel deposit failed.");
     }
 
-    function withdraw(bytes32 password) public returns(bool success) {
-      bytes32 storeLocation = getStoreLocation(password, msg.sender);
+    function withdraw(bytes32 senderpassword, bytes32 receiverpassword) public returns(bool success) {
+      bytes32 storeLocation = getStoreLocation(senderpassword, receiverpassword);
 
       uint amount = deposits[storeLocation].amount;
 
       require(amount > 0, "No deposit at this storeLocation");
-      require(password != 0, "Password required");
+      require(senderpassword != 0, "Sender password required");
+      require(receiverpassword != 0, "Receiver password required");
 
       emit LogWithdrawn(msg.sender, storeLocation, amount);
 

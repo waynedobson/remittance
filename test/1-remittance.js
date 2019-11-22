@@ -11,24 +11,32 @@ contract("Remittance features", accounts => {
 
   const { BN, toWei, utf8ToHex } = web3.utils;
 
-  const password = utf8ToHex("123456");
-  const receiverPassword = utf8ToHex("123456");
-  const senderPassword = utf8ToHex("654321");
+  const senderpassword = utf8ToHex("123456");
+  const receiverpassword = utf8ToHex("654321");
 
   const commision = new BN(1000);
 
   beforeEach("create instance", async function() {
     instance = await Remittance.new({ from: owner });
     exchange = instance.address;
-    storeLocation = await instance.getStoreLocation(password, owner);
+    storeLocation = await instance.getStoreLocation(
+      senderpassword,
+      receiverpassword
+    );
   });
 
   describe("======= storeLocation tests =======", () => {
     noPassword = utf8ToHex("");
 
-    it("Needs password", async () => {
+    it("Needs receiverpassword", async () => {
       await truffleAssert.reverts(
-        instance.getStoreLocation(noPassword, receiver)
+        instance.getStoreLocation(senderpassword, noPassword)
+      );
+    });
+
+    it("Needs senderpassword", async () => {
+      await truffleAssert.reverts(
+        instance.getStoreLocation(noPassword, receiverpassword)
       );
     });
   });
@@ -113,7 +121,7 @@ contract("Remittance features", accounts => {
 
       await increaseTime(duration.days(3));
 
-      await instance.withdraw(password, {
+      await instance.withdraw(senderpassword, receiverpassword, {
         from: owner
       });
 
@@ -188,7 +196,7 @@ contract("Remittance features", accounts => {
     it("Cancels a deposit after it is expired", async () => {
       await increaseTime(duration.days(3));
 
-      let txObj = await instance.cancelDeposit(password, owner, {
+      let txObj = await instance.cancelDeposit(storeLocation, {
         from: sender
       });
 
@@ -211,24 +219,24 @@ contract("Remittance features", accounts => {
       await increaseTime(duration.days(3));
 
       await truffleAssert.reverts(
-        instance.cancelDeposit(password, owner, { from: stranger })
+        instance.cancelDeposit(storeLocation, { from: stranger })
       );
     });
 
-    it("Prevents a deposit from being canceled with incorrect password", async () => {
-      const badPassword = utf8ToHex("wrong");
+    it("Prevents a deposit from being canceled with incorrect storeLocation", async () => {
+      const badStoreLocation = utf8ToHex("wrong");
 
       await increaseTime(duration.days(3));
 
       await truffleAssert.reverts(
-        instance.cancelDeposit(badPassword, owner, { from: sender }),
+        instance.cancelDeposit(badStoreLocation, { from: sender }),
         "No deposit at this storeLocation"
       );
     });
 
     it("Prevents a deposit from being canceled before it's expired", async () => {
       await truffleAssert.reverts(
-        instance.cancelDeposit(password, owner, { from: sender }),
+        instance.cancelDeposit(storeLocation, { from: sender }),
         "Cannot cancel a deposit before it has expired"
       );
     });
@@ -236,7 +244,7 @@ contract("Remittance features", accounts => {
     it("Allows re-use of password after cancel", async () => {
       await increaseTime(duration.days(3));
 
-      await instance.cancelDeposit(password, owner, { from: sender });
+      await instance.cancelDeposit(storeLocation, { from: sender });
 
       txObj = await instance.deposit(storeLocation, duration.days(3), {
         from: sender,
@@ -259,18 +267,18 @@ contract("Remittance features", accounts => {
       });
     });
 
-    it("Allows exchange owner to withdraw balance", async () => {
+    it("Allows stranger to withdraw balance", async () => {
       const startExchangeBalance = new BN(await web3.eth.getBalance(exchange));
 
-      const txObj = await instance.withdraw(password, {
-        from: owner
+      const txObj = await instance.withdraw(senderpassword, receiverpassword, {
+        from: stranger
       });
 
       const logWithdrawn = txObj.logs[0];
 
       assert.strictEqual(txObj.logs.length, 1);
       assert.strictEqual(logWithdrawn.event, "LogWithdrawn");
-      assert.strictEqual(logWithdrawn.args[0], owner);
+      assert.strictEqual(logWithdrawn.args[0], stranger);
       assert.strictEqual(logWithdrawn.args[1], storeLocation);
       assert.strictEqual(
         logWithdrawn.args[2].toString(),
@@ -305,7 +313,7 @@ contract("Remittance features", accounts => {
       const badPassword = utf8ToHex("wrong");
 
       await truffleAssert.reverts(
-        instance.withdraw(badPassword, { from: owner })
+        instance.withdraw(senderpassword, badPassword, { from: owner })
       );
     });
   });
