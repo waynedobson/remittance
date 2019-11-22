@@ -25,22 +25,6 @@ contract("Remittance features", accounts => {
     );
   });
 
-  describe("======= storeLocation tests =======", () => {
-    noPassword = utf8ToHex("");
-
-    it("Needs receiverpassword", async () => {
-      await truffleAssert.reverts(
-        instance.getStoreLocation(senderpassword, noPassword)
-      );
-    });
-
-    it("Needs senderpassword", async () => {
-      await truffleAssert.reverts(
-        instance.getStoreLocation(noPassword, receiverpassword)
-      );
-    });
-  });
-
   describe("======= Deposit tests =======", () => {
     it("Creates new deposit", async () => {
       const txObj = await instance.deposit(storeLocation, duration.days(3), {

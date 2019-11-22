@@ -31,8 +31,6 @@ contract Remittance is Owned {
     }
 
     function getStoreLocation(bytes32 senderpassword, bytes32 receiverpassword) public view returns(bytes32 hash) {
-        require(senderpassword != 0, "Password required");
-        require(receiverpassword != 0, "Password required");
       hash = keccak256(abi.encodePacked(address(this), senderpassword, receiverpassword));
     }
 
@@ -81,8 +79,6 @@ contract Remittance is Owned {
       uint amount = deposits[storeLocation].amount;
 
       require(amount > 0, "No deposit at this storeLocation");
-      require(senderpassword != 0, "Sender password required");
-      require(receiverpassword != 0, "Receiver password required");
 
       emit LogWithdrawn(msg.sender, storeLocation, amount);
 
