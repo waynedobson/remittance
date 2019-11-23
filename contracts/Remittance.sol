@@ -12,16 +12,16 @@ contract Remittance is Owned {
       uint amount;
     }
 
-    uint constant TX_COMM = 1000; // fixed commision
+    uint constant TX_COMM = 1000; // fixed commission
     uint public commission;
 
     mapping(bytes32 => Deposit) public deposits;
 
     event LogNewDepositMade(address indexed emitter, uint deadline, uint amount, bytes32 indexed storeLocation);
-    event LogCommisionMade(address indexed emitter, address indexed owner, uint amount, bytes32 indexed storeLocation);
+    event LogCommissionMade(address indexed emitter, address indexed owner, uint amount, bytes32 indexed storeLocation);
     event LogDepositCancelled(address indexed emitter, uint amount, bytes32 indexed storeLocation);
     event LogWithdrawn(address indexed emitter, bytes32 indexed storeLocation, uint amount);
-    event LogCommisionWithdrawn(address indexed emitter, uint amount);
+    event LogCommissionWithdrawn(address indexed emitter, uint amount);
 
     constructor () public {
     }
@@ -45,7 +45,7 @@ contract Remittance is Owned {
       address owner = getOwner();
 
       commission = commission.add(TX_COMM);
-      emit LogCommisionMade(msg.sender, owner, TX_COMM, storeLocation);
+      emit LogCommissionMade(msg.sender, owner, TX_COMM, storeLocation);
 
       emit LogNewDepositMade(msg.sender, deadline, amount, storeLocation);
       deposits[storeLocation] = Deposit({
@@ -88,16 +88,16 @@ contract Remittance is Owned {
       require(success, "Withdrawal failed.");
     }
 
-    function withdrawCommision() public _onlyOwner returns(bool success) {
+    function withdrawCommission() public _onlyOwner returns(bool success) {
       uint amount = commission;
 
-      require(amount > 0, "No Commision to withdraw");
+      require(amount > 0, "No commission to withdraw");
 
       commission = 0;
 
-      emit LogCommisionWithdrawn(msg.sender, amount);
+      emit LogCommissionWithdrawn(msg.sender, amount);
 
       (success,) = msg.sender.call.value(amount)("");
-      require(success, "Commision withdrawal failed.");
+      require(success, "commission withdrawal failed.");
     }
 }

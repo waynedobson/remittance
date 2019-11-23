@@ -14,7 +14,7 @@ contract("Remittance features", accounts => {
   const senderpassword = utf8ToHex("123456");
   const receiverpassword = utf8ToHex("654321");
 
-  const commision = new BN(1000);
+  const commission = new BN(1000);
 
   beforeEach("create instance", async function() {
     instance = await Remittance.new({ from: owner });
@@ -34,30 +34,30 @@ contract("Remittance features", accounts => {
 
       assert.strictEqual(txObj.logs.length, 2, "There should be 2 events");
 
-      const logCommisionMade = txObj.logs[0];
+      const logCommissionMade = txObj.logs[0];
 
       assert.strictEqual(
-        logCommisionMade.event,
-        "LogCommisionMade",
-        "First event is not LogCommisionMade"
+        logCommissionMade.event,
+        "LogCommissionMade",
+        "First event is not LogCommissionMade"
       );
       assert.strictEqual(
-        logCommisionMade.args[0],
+        logCommissionMade.args[0],
         sender,
         "Event emmitter address is sender"
       );
       assert.strictEqual(
-        logCommisionMade.args[1],
+        logCommissionMade.args[1],
         await instance.getOwner(),
         "Incorrect owner address"
       );
       assert.strictEqual(
-        logCommisionMade.args[2].toString(),
+        logCommissionMade.args[2].toString(),
         "1000",
-        "Incorrect commision amount"
+        "Incorrect commission amount"
       );
       assert.strictEqual(
-        logCommisionMade.args[3].toString(),
+        logCommissionMade.args[3].toString(),
         storeLocation.toString(),
         "Incorrect storeLocation"
       );
@@ -77,8 +77,8 @@ contract("Remittance features", accounts => {
 
       assert.strictEqual(
         logDepositMade.args[2].toString(),
-        new BN(toWei("0.1", "ether")).sub(commision).toString(),
-        "Incorrect Eth amount in event(taking into acccount commision)"
+        new BN(toWei("0.1", "ether")).sub(commission).toString(),
+        "Incorrect Eth amount in event(taking into acccount commission)"
       );
 
       assert.strictEqual(
@@ -90,16 +90,16 @@ contract("Remittance features", accounts => {
       const deposit = await instance.deposits.call(storeLocation);
       assert.strictEqual(
         deposit.amount.toString(),
-        new BN(toWei("0.1", "ether")).sub(commision).toString(),
-        "Incorrect Eth amount (taking into acccount commision)"
+        new BN(toWei("0.1", "ether")).sub(commission).toString(),
+        "Incorrect Eth amount (taking into acccount commission)"
       );
 
-      const commisionPaid = await instance.commission.call();
+      const commissionPaid = await instance.commission.call();
 
       assert.strictEqual(
-        commisionPaid.toString(),
-        commision.toString(),
-        "Incorrect commision amount)"
+        commissionPaid.toString(),
+        commission.toString(),
+        "Incorrect commission amount)"
       );
     });
 
@@ -123,7 +123,7 @@ contract("Remittance features", accounts => {
       deposit = await instance.deposits.call(storeLocation);
       assert.strictEqual(
         deposit.amount.toString(),
-        new BN(toWei("0.1", "ether")).sub(commision).toString()
+        new BN(toWei("0.1", "ether")).sub(commission).toString()
       );
     });
 
@@ -197,8 +197,8 @@ contract("Remittance features", accounts => {
       assert.strictEqual(logDepositCancelled.args[0], sender); // owner address matches
       assert.strictEqual(
         logDepositCancelled.args[1].toString(),
-        new BN(toWei("0.1", "ether")).sub(commision).toString()
-      ); // amount is correct less commision
+        new BN(toWei("0.1", "ether")).sub(commission).toString()
+      ); // amount is correct less commission
       assert.strictEqual(logDepositCancelled.args[2], storeLocation); // Password is correct
 
       const deposit = instance.deposits.call(storeLocation);
@@ -244,7 +244,7 @@ contract("Remittance features", accounts => {
       deposit = await instance.deposits.call(storeLocation);
       assert.strictEqual(
         deposit.amount.toString(),
-        new BN(toWei("0.1", "ether")).sub(commision).toString()
+        new BN(toWei("0.1", "ether")).sub(commission).toString()
       );
     });
   });
@@ -272,7 +272,7 @@ contract("Remittance features", accounts => {
       assert.strictEqual(logWithdrawn.args[1], storeLocation);
       assert.strictEqual(
         logWithdrawn.args[2].toString(),
-        new BN(toWei("0.1", "ether")).sub(commision).toString()
+        new BN(toWei("0.1", "ether")).sub(commission).toString()
       );
 
       const tx = await web3.eth.getTransaction(txObj.tx);
@@ -286,7 +286,7 @@ contract("Remittance features", accounts => {
 
       assert.strictEqual(
         await web3.eth.getBalance(exchange),
-        new BN(commision).toString(),
+        new BN(commission).toString(),
         "invalid amount of Eth left on exchange after withdrawal"
       );
 
@@ -308,7 +308,7 @@ contract("Remittance features", accounts => {
     });
   });
 
-  describe("======= withdraw Commision test =======", () => {
+  describe("======= withdraw Commission test =======", () => {
     beforeEach("Create deposit", async () => {
       await instance.deposit(storeLocation, duration.days(3), {
         from: sender,
@@ -316,21 +316,24 @@ contract("Remittance features", accounts => {
       });
     });
 
-    it("Allows owner to withdraw commision", async () => {
-      const startCommisionBalance = instance.commission.call();
+    it("Allows owner to withdraw commission", async () => {
+      const startCommissionBalance = instance.commission.call();
 
       const startOwnerBalance = new BN(await web3.eth.getBalance(owner));
 
-      const txObj = await instance.withdrawCommision({
+      const txObj = await instance.withdrawCommission({
         from: owner
       });
 
-      const logCommisionWithdrawn = txObj.logs[0];
+      const logCommissionWithdrawn = txObj.logs[0];
 
       assert.strictEqual(txObj.logs.length, 1);
-      assert.strictEqual(logCommisionWithdrawn.event, "LogCommisionWithdrawn");
-      assert.strictEqual(logCommisionWithdrawn.args[0], owner);
-      assert(logCommisionWithdrawn.args[1].eq(commision));
+      assert.strictEqual(
+        logCommissionWithdrawn.event,
+        "LogCommissionWithdrawn"
+      );
+      assert.strictEqual(logCommissionWithdrawn.args[0], owner);
+      assert(logCommissionWithdrawn.args[1].eq(commission));
 
       const tx = await web3.eth.getTransaction(txObj.tx);
 
@@ -344,16 +347,16 @@ contract("Remittance features", accounts => {
       assert.strictEqual(
         await startOwnerBalance
           .sub(txCost)
-          .add(commision)
+          .add(commission)
           .toString(),
         endOwnerBalance.toString(),
-        "Eth Balance for owner not valid after withdrawal of commision"
+        "Eth Balance for owner not valid after withdrawal of commission"
       );
     });
 
-    it("Allows only the owner to withdraw Commision", async () => {
+    it("Allows only the owner to withdraw Commission", async () => {
       await truffleAssert.reverts(
-        instance.withdrawCommision({
+        instance.withdrawCommission({
           from: stranger
         })
       );
