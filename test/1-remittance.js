@@ -94,7 +94,7 @@ contract("Remittance features", accounts => {
         "Incorrect Eth amount (taking into acccount commission)"
       );
 
-      const commissionPaid = await instance.commission.call();
+      const commissionPaid = await instance.commissions.call(owner);
 
       assert.strictEqual(
         commissionPaid.toString(),
@@ -317,7 +317,7 @@ contract("Remittance features", accounts => {
     });
 
     it("Allows owner to withdraw commission", async () => {
-      const startCommissionBalance = instance.commission.call();
+      const startCommissionBalance = instance.commissions.call(owner);
 
       const startOwnerBalance = new BN(await web3.eth.getBalance(owner));
 

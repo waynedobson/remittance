@@ -13,9 +13,9 @@ contract Remittance is Owned {
     }
 
     uint constant TX_COMM = 1000; // fixed commission
-    uint public commission;
 
     mapping(bytes32 => Deposit) public deposits;
+    mapping(address => uint) public commissions;
 
     event LogNewDepositMade(address indexed emitter, uint deadline, uint amount, bytes32 indexed storeLocation);
     event LogCommissionMade(address indexed emitter, address indexed owner, uint amount, bytes32 indexed storeLocation);
@@ -44,7 +44,7 @@ contract Remittance is Owned {
       uint deadline = now.add(delay);
       address owner = getOwner();
 
-      commission = commission.add(TX_COMM);
+      commissions[owner] = commissions[owner].add(TX_COMM);
       emit LogCommissionMade(msg.sender, owner, TX_COMM, storeLocation);
 
       emit LogNewDepositMade(msg.sender, deadline, amount, storeLocation);
@@ -88,12 +88,12 @@ contract Remittance is Owned {
       require(success, "Withdrawal failed.");
     }
 
-    function withdrawCommission() public _onlyOwner returns(bool success) {
-      uint amount = commission;
+    function withdrawCommission() public returns(bool success) {
+      uint amount = commissions[msg.sender];
 
       require(amount > 0, "No commission to withdraw");
 
-      commission = 0;
+      commissions[msg.sender] = 0;
 
       emit LogCommissionWithdrawn(msg.sender, amount);
 
