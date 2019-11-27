@@ -21,7 +21,8 @@ contract("Remittance features", accounts => {
     exchange = instance.address;
     storeLocation = await instance.getStoreLocation(
       senderpassword,
-      receiverpassword
+      receiverpassword,
+      owner
     );
   });
 
@@ -257,18 +258,18 @@ contract("Remittance features", accounts => {
       });
     });
 
-    it("Allows stranger to withdraw balance", async () => {
+    it("Allows owner to withdraw balance", async () => {
       const startExchangeBalance = new BN(await web3.eth.getBalance(exchange));
 
       const txObj = await instance.withdraw(senderpassword, receiverpassword, {
-        from: stranger
+        from: owner
       });
 
       const logWithdrawn = txObj.logs[0];
 
       assert.strictEqual(txObj.logs.length, 1);
       assert.strictEqual(logWithdrawn.event, "LogWithdrawn");
-      assert.strictEqual(logWithdrawn.args[0], stranger);
+      assert.strictEqual(logWithdrawn.args[0], owner);
       assert.strictEqual(logWithdrawn.args[1], storeLocation);
       assert.strictEqual(
         logWithdrawn.args[2].toString(),

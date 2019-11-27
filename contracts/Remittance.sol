@@ -30,8 +30,8 @@ contract Remittance is Owned {
       revert("No fallback function");
     }
 
-    function getStoreLocation(bytes32 senderpassword, bytes32 receiverpassword) public view returns(bytes32 hash) {
-      hash = keccak256(abi.encodePacked(address(this), senderpassword, receiverpassword));
+    function getStoreLocation(bytes32 senderpassword, bytes32 receiverpassword, address owner) public view returns(bytes32 hash) {
+      hash = keccak256(abi.encodePacked(address(this), senderpassword, receiverpassword, owner));
     }
 
     function deposit(bytes32 storeLocation, uint delay) public payable returns(bool) {
@@ -74,7 +74,7 @@ contract Remittance is Owned {
     }
 
     function withdraw(bytes32 senderpassword, bytes32 receiverpassword) public returns(bool success) {
-      bytes32 storeLocation = getStoreLocation(senderpassword, receiverpassword);
+      bytes32 storeLocation = getStoreLocation(senderpassword, receiverpassword, msg.sender);
 
       uint amount = deposits[storeLocation].amount;
 
