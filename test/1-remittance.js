@@ -43,22 +43,22 @@ contract("Remittance features", accounts => {
         "First event is not LogCommissionMade"
       );
       assert.strictEqual(
-        logCommissionMade.args[0],
+        logCommissionMade.args.emitter,
         sender,
-        "Event emmitter address is sender"
+        "Event emitter address is sender"
       );
       assert.strictEqual(
-        logCommissionMade.args[1],
+        logCommissionMade.args.exchangeOwnerAddress,
         await instance.getOwner(),
         "Incorrect owner address"
       );
       assert.strictEqual(
-        logCommissionMade.args[2].toString(),
+        logCommissionMade.args.amount.toString(),
         "1000",
         "Incorrect commission amount"
       );
       assert.strictEqual(
-        logCommissionMade.args[3].toString(),
+        logCommissionMade.args.storeLocation.toString(),
         storeLocation.toString(),
         "Incorrect storeLocation"
       );
@@ -71,19 +71,19 @@ contract("Remittance features", accounts => {
         "Second event is not LogNewDepositMade"
       );
       assert.strictEqual(
-        logDepositMade.args[0],
+        logDepositMade.args.emitter,
         sender,
         "Incorrect Sender address"
       );
 
       assert.strictEqual(
-        logDepositMade.args[2].toString(),
+        logDepositMade.args.amount.toString(),
         new BN(toWei("0.1", "ether")).sub(commission).toString(),
         "Incorrect Eth amount in event(taking into acccount commission)"
       );
 
       assert.strictEqual(
-        txObj.logs[1].args[3],
+        txObj.logs[1].args.storeLocation,
         storeLocation,
         "Incorrect storeLocation"
       );
@@ -193,14 +193,14 @@ contract("Remittance features", accounts => {
 
       const logDepositCancelled = txObj.logs[0];
 
-      assert.strictEqual(txObj.logs.length, 1); // correct number of logs
-      assert.strictEqual(logDepositCancelled.event, "LogDepositCancelled"); // log is LogDepositCancelled
-      assert.strictEqual(logDepositCancelled.args[0], sender); // owner address matches
+      assert.strictEqual(txObj.logs.length, 1);
+      assert.strictEqual(logDepositCancelled.event, "LogDepositCancelled");
+      assert.strictEqual(logDepositCancelled.args.emitter, sender);
       assert.strictEqual(
-        logDepositCancelled.args[1].toString(),
+        logDepositCancelled.args.amount.toString(),
         new BN(toWei("0.1", "ether")).sub(commission).toString()
-      ); // amount is correct less commission
-      assert.strictEqual(logDepositCancelled.args[2], storeLocation); // Password is correct
+      );
+      assert.strictEqual(logDepositCancelled.args.storeLocation, storeLocation);
 
       const deposit = instance.deposits.call(storeLocation);
       assert.strictEqual(deposit.sender, undefined);
@@ -269,10 +269,10 @@ contract("Remittance features", accounts => {
 
       assert.strictEqual(txObj.logs.length, 1);
       assert.strictEqual(logWithdrawn.event, "LogWithdrawn");
-      assert.strictEqual(logWithdrawn.args[0], owner);
-      assert.strictEqual(logWithdrawn.args[1], storeLocation);
+      assert.strictEqual(logWithdrawn.args.exchangeOwnerAddress, owner);
+      assert.strictEqual(logWithdrawn.args.storeLocation, storeLocation);
       assert.strictEqual(
-        logWithdrawn.args[2].toString(),
+        logWithdrawn.args.amount.toString(),
         new BN(toWei("0.1", "ether")).sub(commission).toString()
       );
 
@@ -333,8 +333,11 @@ contract("Remittance features", accounts => {
         logCommissionWithdrawn.event,
         "LogCommissionWithdrawn"
       );
-      assert.strictEqual(logCommissionWithdrawn.args[0], owner);
-      assert(logCommissionWithdrawn.args[1].eq(commission));
+      assert.strictEqual(
+        logCommissionWithdrawn.args.exchangeOwnerAddress,
+        owner
+      );
+      assert(logCommissionWithdrawn.args.amount.eq(commission));
 
       const tx = await web3.eth.getTransaction(txObj.tx);
 

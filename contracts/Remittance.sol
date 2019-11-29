@@ -20,8 +20,8 @@ contract Remittance is Owned {
     event LogNewDepositMade(address indexed emitter, uint deadline, uint amount, bytes32 indexed storeLocation);
     event LogCommissionMade(address indexed emitter, address indexed exchangeOwnerAddress, uint amount, bytes32 indexed storeLocation);
     event LogDepositCancelled(address indexed emitter, uint amount, bytes32 indexed storeLocation);
-    event LogWithdrawn(address indexed emitter, bytes32 indexed storeLocation, uint amount);
-    event LogCommissionWithdrawn(address indexed emitter, uint amount);
+    event LogWithdrawn(address indexed exchangeOwnerAddress, bytes32 indexed storeLocation, uint amount);
+    event LogCommissionWithdrawn(address indexed exchangeOwnerAddress, uint amount);
 
     constructor () public {
     }
