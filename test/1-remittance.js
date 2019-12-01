@@ -42,21 +42,25 @@ contract("Remittance features", accounts => {
         "LogCommissionMade",
         "First event is not LogCommissionMade"
       );
+
       assert.strictEqual(
         logCommissionMade.args.emitter,
         sender,
         "Event emitter address is sender"
       );
+
       assert.strictEqual(
         logCommissionMade.args.exchangeOwnerAddress,
         await instance.getOwner(),
         "Incorrect owner address"
       );
+
       assert.strictEqual(
         logCommissionMade.args.amount.toString(),
         "1000",
         "Incorrect commission amount"
       );
+
       assert.strictEqual(
         logCommissionMade.args.storeLocation.toString(),
         storeLocation.toString(),
@@ -70,6 +74,7 @@ contract("Remittance features", accounts => {
         "LogNewDepositMade",
         "Second event is not LogNewDepositMade"
       );
+
       assert.strictEqual(
         logDepositMade.args.emitter,
         sender,
@@ -83,7 +88,7 @@ contract("Remittance features", accounts => {
       );
 
       assert.strictEqual(
-        txObj.logs[1].args.storeLocation,
+        logDepositMade.args.storeLocation,
         storeLocation,
         "Incorrect storeLocation"
       );
@@ -269,7 +274,7 @@ contract("Remittance features", accounts => {
 
       assert.strictEqual(txObj.logs.length, 1);
       assert.strictEqual(logWithdrawn.event, "LogWithdrawn");
-      assert.strictEqual(logWithdrawn.args.exchangeOwnerAddress, owner);
+      assert.strictEqual(logWithdrawn.args.exchangerAddress, owner);
       assert.strictEqual(logWithdrawn.args.storeLocation, storeLocation);
       assert.strictEqual(
         logWithdrawn.args.amount.toString(),

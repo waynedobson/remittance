@@ -20,7 +20,7 @@ contract Remittance is Owned {
     event LogNewDepositMade(address indexed emitter, uint deadline, uint amount, bytes32 indexed storeLocation);
     event LogCommissionMade(address indexed emitter, address indexed exchangeOwnerAddress, uint amount, bytes32 indexed storeLocation);
     event LogDepositCancelled(address indexed emitter, uint amount, bytes32 indexed storeLocation);
-    event LogWithdrawn(address indexed exchangeOwnerAddress, bytes32 indexed storeLocation, uint amount);
+    event LogWithdrawn(address indexed exchangerAddress, bytes32 indexed storeLocation, uint amount);
     event LogCommissionWithdrawn(address indexed exchangeOwnerAddress, uint amount);
 
     constructor () public {
@@ -30,8 +30,8 @@ contract Remittance is Owned {
       revert("No fallback function");
     }
 
-    function getStoreLocation(bytes32 senderPassword, bytes32 receiverPassword, address exchangeOwnerAddress) public view returns(bytes32 hash) {
-      hash = keccak256(abi.encodePacked(address(this), senderPassword, receiverPassword, exchangeOwnerAddress));
+    function getStoreLocation(bytes32 senderPassword, bytes32 receiverPassword, address exchangerAddress) public view returns(bytes32 hash) {
+      hash = keccak256(abi.encodePacked(address(this), senderPassword, receiverPassword, exchangerAddress));
     }
 
     function deposit(bytes32 storeLocation, uint delay) public payable returns(bool) {
@@ -89,6 +89,9 @@ contract Remittance is Owned {
     }
 
     function withdrawCommission() public returns(bool success) {
+
+      require(msg.sender == getOwner());
+
       uint amount = commissions[msg.sender];
 
       require(amount > 0, "No commission to withdraw");
